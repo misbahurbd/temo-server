@@ -32,6 +32,7 @@ export const envValidationSchema = z
     REDIS_URL: z.url().optional(),
     REDIS_HOST: z.string().optional(),
     REDIS_PORT: z.coerce.number().int().min(1).max(65535).default(6379),
+    REDIS_USERNAME: z.string().optional(),
     REDIS_PASSWORD: z.string().optional(),
     REDIS_DB: z.coerce.number().int().min(0).default(0),
     REDIS_TLS: booleanFromEnv,
