@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import { RedisService } from 'src/infrastructure/redis/redis.service';
+import passport from 'passport';
 
 export const configureSession = (
   app: INestApplication,
@@ -18,6 +19,7 @@ export const configureSession = (
   const sessionName = configService.getOrThrow<string>('SESSION_NAME');
   const sessionRolling = configService.get<boolean>('SESSION_ROLLING', false);
 
+  // Express session configuration
   app.use(
     session({
       store: new RedisStore({
@@ -40,4 +42,8 @@ export const configureSession = (
       },
     }),
   );
+
+  // Passport session configuration
+  app.use(passport.initialize());
+  app.use(passport.session());
 };
