@@ -1,12 +1,24 @@
 model User {
-    id        String   @id @default(uuid())
-    name      String
-    photo     String?
-    email     String   @unique
-    password  String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id          String  @id @default(uuid())
+  firstName   String  @db.VarChar(50)
+  lastName    String  @db.VarChar(50)
+  displayName String? @db.VarChar(100)
+  photo       String? @db.VarChar(255)
+  email       String  @unique @db.VarChar(255)
+  password    String  @db.VarChar(255)
 
-    @@index([email])
-    @@map("users")
+  isActive    Boolean   @default(true)
+  isDeleted   Boolean   @default(false)
+  lastLoginAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  teams       Team[]
+  teamMembers TeamMember[]
+
+  @@index([email])
+  @@index([isActive])
+  @@index([isDeleted])
+  @@map("users")
 }

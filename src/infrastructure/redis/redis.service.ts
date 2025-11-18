@@ -13,29 +13,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
   private client: RedisClientType;
 
-  constructor(private readonly configService: ConfigService<EnvVariables>) {}
+  constructor(private readonly configService: ConfigService<EnvVariables>) {
+    const redisOptions = this.getRedisOptions();
+
+    this.client = createClient(redisOptions) as RedisClientType;
+
+    this.setupEventHandlers(this.client, 'Client');
+  }
 
   async onModuleInit() {
     try {
-      const options = this.getRedisOptions();
-      this.client = createClient(options) as RedisClientType;
-
-      this.client.on('error', (err) => {
-        this.logger.error('Redis Client Error', err);
-      });
-
-      this.client.on('connect', () => {
-        this.logger.log('Redis Client connecting...');
-      });
-
-      this.client.on('ready', () => {
-        this.logger.log('Redis Client ready');
-      });
-
-      this.client.on('reconnecting', () => {
-        this.logger.warn('Redis Client reconnecting...');
-      });
-
       await this.client.connect();
       this.logger.log('Redis connected successfully');
     } catch (error) {
@@ -45,6 +32,31 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       );
       throw error;
     }
+  }
+
+  private setupEventHandlers(
+    client: RedisClientType,
+    clientName: string,
+  ): void {
+    client.on('connect', () => {
+      this.logger.log(`${clientName} connecting to Redis...`);
+    });
+
+    client.on('ready', () => {
+      this.logger.log(`${clientName} connected and ready`);
+    });
+
+    client.on('error', (error: Error) => {
+      this.logger.error(`${clientName} error:`, error.message);
+    });
+
+    client.on('end', () => {
+      this.logger.log(`${clientName} connection ended`);
+    });
+
+    client.on('reconnecting', () => {
+      this.logger.warn(`${clientName} reconnecting...`);
+    });
   }
 
   async onModuleDestroy() {
@@ -80,7 +92,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private getRedisOptions(): RedisClientOptions {
+  private getRedisOptions() {
     const redisUrl = this.configService.get<string>('REDIS_URL');
     const redisHost = this.configService.get<string>('REDIS_HOST');
     const redisPort = this.configService.get<number>('REDIS_PORT', 6379);

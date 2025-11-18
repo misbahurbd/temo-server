@@ -4,6 +4,7 @@ import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import { RedisService } from 'src/infrastructure/redis/redis.service';
 import passport from 'passport';
+import { v4 as uuidv4 } from 'uuid';
 
 export const configureSession = (
   app: INestApplication,
@@ -22,6 +23,7 @@ export const configureSession = (
   // Express session configuration
   app.use(
     session({
+      genid: () => uuidv4(),
       store: new RedisStore({
         client: redisClient,
         prefix: 'auth:',
