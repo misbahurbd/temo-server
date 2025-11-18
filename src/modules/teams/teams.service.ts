@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 
 @Injectable()
 export class TeamsService {
@@ -149,6 +150,59 @@ export class TeamsService {
       });
 
       return members;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async createTeamMember(
+    userId: string,
+    teamId: string,
+    createTeamMemberDto: CreateTeamMemberDto,
+  ) {
+    try {
+      const member = await this.prisma.teamMember.create({
+        data: {
+          ...createTeamMemberDto,
+          createdById: userId,
+          teamId: teamId,
+        },
+      });
+
+      return member;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async deleteTeamMember(userId: string, teamId: string, memberId: string) {
+    try {
+      await this.prisma.teamMember.delete({
+        where: { id: memberId, createdById: userId, teamId: teamId },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getTeamMemberById(userId: string, teamId: string, memberId: string) {
+    try {
+      const member = await this.prisma.teamMember.findUnique({
+        where: { id: memberId, createdById: userId, teamId: teamId },
+      });
+
+      if (!member) {
+        throw new NotFoundException('Member not found');
+      }
+
+      if (!member.isActive) {
+        throw new NotFoundException('Member is not active');
+      }
+
+      return member;
     } catch (error) {
       this.logger.error(error);
       throw error;
