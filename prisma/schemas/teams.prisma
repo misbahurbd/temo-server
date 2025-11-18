@@ -1,0 +1,39 @@
+model Team {
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(100)
+  description String? @db.VarChar(255)
+  isActive    Boolean @default(true)
+
+  members TeamMember[]
+
+  createdById String
+  createdby   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdById])
+  @@index([isActive])
+  @@map("teams")
+}
+
+model TeamMember {
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(100)
+  role        String  @db.VarChar(100)
+  capacity    Int
+  teamId      String
+  isActive    Boolean @default(true)
+  createdById String
+
+  team      Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdby User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([createdById])
+  @@index([isActive])
+  @@map("team_members")
+}
