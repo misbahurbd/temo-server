@@ -18,7 +18,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     try {
       const options = this.getRedisOptions();
-      console.log(options);
       this.client = createClient(options) as RedisClientType;
 
       this.client.on('error', (err) => {
