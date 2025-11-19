@@ -527,7 +527,11 @@ export class TasksService {
   async getTaskActivityLog(userId: string) {
     try {
       const activityLog = await this.prisma.activity.findMany({
-        where: { userId },
+        where: {
+          userId,
+          assigneeFromId: { not: '' },
+          assigneeToId: { not: '' },
+        },
         take: 10,
         orderBy: {
           createdAt: 'desc',

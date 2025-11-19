@@ -116,6 +116,28 @@ export class ProjectsController {
     };
   }
 
+  @Get(':projectId/tasks')
+  @ApiOperation({ summary: 'Get a project by ID with its tasks' })
+  @ApiSuccessResponse({
+    type: ProjectResponseDto,
+    description: 'Project fetched successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getProjectByIdWithTasks(
+    @Req() req: Request & { user: SessionUser },
+    @Param('projectId') projectId: string,
+  ) {
+    const project = await this.projectsService.projectByIdWithTasks(
+      req.user.id,
+      projectId,
+    );
+    return {
+      message: 'Project fetched successfully',
+      data: project,
+    };
+  }
+
   @Put(':projectId')
   @ApiOperation({ summary: 'Update a project by ID' })
   @ApiSuccessResponse({

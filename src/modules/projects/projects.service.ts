@@ -183,4 +183,22 @@ export class ProjectsService {
       throw error;
     }
   }
+
+  async projectByIdWithTasks(userId: string, projectId: string) {
+    try {
+      const project = await this.prisma.project.findUnique({
+        where: { id: projectId, createdById: userId },
+        include: { tasks: { include: { assignee: true } } },
+      });
+
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+
+      return project;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
 }
