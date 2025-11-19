@@ -121,3 +121,26 @@ export class TeamResponseWithMembersDto extends TeamResponseDto {
   })
   members: TeamMemberResponseDto[];
 }
+
+export class TeamSelectListResponseDto {
+  @ApiProperty({
+    description: 'The ID of the team',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: true,
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'The name of the team',
+    example: 'Team Developers',
+    required: true,
+  })
+  name: string;
+
+  @ApiProperty({
+    description: 'The number of members in the team',
+    example: 1,
+    required: true,
+  })
+  membersCount: number;
+}

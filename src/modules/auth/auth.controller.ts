@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { LocalAuthGuard } from './guards/local.guard';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
+import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.decorator';
 
 interface SessionUser {
   id: string;
@@ -27,10 +28,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({
+  @ApiSuccessResponse({
+    type: RegisterResponseDto,
     status: 201,
     description: 'User registered successfully',
-    type: RegisterResponseDto,
   })
   @Post('register')
   async register(
@@ -48,7 +49,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Login a user' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'User logged in successfully',
     type: LoginResponseDto,
@@ -67,7 +68,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Logout a user and destroy session' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'User logged out successfully',
   })

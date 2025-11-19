@@ -17,13 +17,16 @@ import {
   TeamMemberResponseDto,
   TeamResponseDto,
   TeamResponseWithMembersDto,
+  TeamSelectListResponseDto,
 } from './dto/team-response.dto';
-import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOperation } from '@nestjs/swagger';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { SessionUser } from '../auth/serializers/session.serializer';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
-import { GetTeamsQueryDto } from './dto/get-teams-query.dto';
+import { TeamQueryDto } from './dto/team-query.dto';
+import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.decorator';
+import { Request } from 'express';
 
 @Controller('teams')
 export class TeamsController {
@@ -31,7 +34,7 @@ export class TeamsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new team' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 201,
     description: 'Team created successfully',
     type: TeamResponseDto,
@@ -52,23 +55,21 @@ export class TeamsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all teams with pagination and search' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Teams fetched successfully',
-    type: [TeamResponseWithMembersDto],
+    type: TeamResponseWithMembersDto,
+    isArray: true,
+    withMeta: true,
   })
   @UseGuards(AuthenticatedGuard)
   @ApiCookieAuth()
   async getTeams(
     @Req() req: Request & { user: SessionUser },
-    @Query() query: GetTeamsQueryDto,
+    @Query() query: TeamQueryDto,
   ) {
-    const result = await this.teamsService.getAllTeams(
-      req.user.id,
-      query.page ?? 1,
-      query.limit ?? 10,
-      query.search,
-    );
+    const result = await this.teamsService.getAllTeams(req.user.id, query);
+
     return {
       message: 'Teams fetched successfully',
       data: result.data as TeamResponseWithMembersDto[],
@@ -76,9 +77,28 @@ export class TeamsController {
     };
   }
 
+  @Get('select-list')
+  @ApiOperation({ summary: 'Get all teams for select list' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Teams fetched successfully',
+    type: TeamSelectListResponseDto,
+    isArray: true,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getTeamsSelectList(@Req() req: Request & { user: SessionUser }) {
+    const result = await this.teamsService.getTeamsSelectList(req.user.id);
+
+    return {
+      message: 'Teams fetched successfully',
+      data: result,
+    };
+  }
+
   @Get(':teamId')
   @ApiOperation({ summary: 'Get a team by ID with its members' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Team fetched successfully',
     type: TeamResponseWithMembersDto,
@@ -99,7 +119,7 @@ export class TeamsController {
 
   @Put(':teamId')
   @ApiOperation({ summary: 'Update a team by ID' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Team updated successfully',
     type: TeamResponseDto,
@@ -125,7 +145,7 @@ export class TeamsController {
 
   @Patch(':teamId')
   @ApiOperation({ summary: 'Update a team by ID partially' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Team updated successfully',
   })
@@ -149,7 +169,7 @@ export class TeamsController {
 
   @Delete(':teamId')
   @ApiOperation({ summary: 'Delete a team by ID' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Team deleted successfully',
   })
@@ -167,10 +187,11 @@ export class TeamsController {
 
   @Get(':teamId/members')
   @ApiOperation({ summary: 'Get all members of a team' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Members fetched successfully',
-    type: [TeamMemberResponseDto],
+    type: TeamMemberResponseDto,
+    isArray: true,
   })
   @UseGuards(AuthenticatedGuard)
   @ApiCookieAuth()
@@ -187,7 +208,7 @@ export class TeamsController {
 
   @Post(':teamId/members')
   @ApiOperation({ summary: 'Create a new member for a team' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 201,
     description: 'Member created successfully',
     type: TeamMemberResponseDto,
@@ -212,7 +233,7 @@ export class TeamsController {
 
   @Delete(':teamId/members/:memberId')
   @ApiOperation({ summary: 'Delete a member by ID' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Member deleted successfully',
   })
@@ -231,7 +252,7 @@ export class TeamsController {
 
   @Get(':teamId/members/:memberId')
   @ApiOperation({ summary: 'Get a member by ID' })
-  @ApiResponse({
+  @ApiSuccessResponse({
     status: 200,
     description: 'Member fetched successfully',
     type: TeamMemberResponseDto,

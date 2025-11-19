@@ -5,6 +5,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { Prisma } from 'generated/prisma/client';
 import { Meta } from 'src/common/interfaces/response.interface';
+import { TeamQueryDto } from './dto/team-query.dto';
 
 @Injectable()
 export class TeamsService {
@@ -42,9 +43,7 @@ export class TeamsService {
 
   async getAllTeams(
     userId: string,
-    page: number = 1,
-    limit: number = 10,
-    search?: string,
+    query: TeamQueryDto,
   ): Promise<{
     data: Prisma.TeamGetPayload<{
       include: { members: true };
@@ -52,24 +51,18 @@ export class TeamsService {
     meta: Meta;
   }> {
     try {
-      const skip = (page - 1) * limit;
+      const { page, limit, sortBy, sortOrder, search } = query;
+      const skip = (query.page - 1) * query.limit;
+      const orderBy = sortBy || 'createdAt';
+      const order = sortOrder || 'asc';
 
-      // Build where clause
-      const where: {
-        createdById: string;
-        isActive?: boolean;
-        OR?: Array<{
-          name?: { contains: string; mode?: 'insensitive' };
-          description?: { contains: string; mode?: 'insensitive' };
-        }>;
-      } = {
+      const filterCondition: Prisma.TeamWhereInput = {
         createdById: userId,
-        isActive: true,
       };
 
       // Add search filter if provided
       if (search) {
-        where.OR = [
+        filterCondition.OR = [
           {
             name: {
               contains: search,
@@ -86,18 +79,18 @@ export class TeamsService {
       }
 
       // Get total count for pagination
-      const total = await this.prisma.team.count({ where });
+      const total = await this.prisma.team.count({ where: filterCondition });
 
       // Get paginated teams
       const teams = await this.prisma.team.findMany({
-        where,
+        where: filterCondition,
         include: {
           members: true,
         },
         skip,
         take: limit,
         orderBy: {
-          createdAt: 'desc',
+          [orderBy]: order,
         },
       });
 
@@ -111,6 +104,32 @@ export class TeamsService {
           totalPages: Math.ceil(total / limit),
         },
       };
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getTeamsSelectList(userId: string) {
+    try {
+      const teams = await this.prisma.team.findMany({
+        where: { createdById: userId },
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              members: true,
+            },
+          },
+        },
+      });
+
+      return teams.map((team) => ({
+        id: team.id,
+        name: team.name,
+        membersCount: team._count.members,
+      }));
     } catch (error) {
       this.logger.error(error);
       throw error;

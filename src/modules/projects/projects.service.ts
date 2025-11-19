@@ -1,0 +1,186 @@
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { ProjectQueryDto } from './dto/project-query.dto';
+import { Prisma, TaskStatus } from 'generated/prisma/client';
+import { UpdateProjectDto } from './dto/update-project.dto';
+
+@Injectable()
+export class ProjectsService {
+  private readonly logger = new Logger(ProjectsService.name);
+  constructor(private readonly prisma: PrismaService) {}
+
+  async createProject(userId: string, createProjectDto: CreateProjectDto) {
+    try {
+      const project = await this.prisma.project.create({
+        data: {
+          ...createProjectDto,
+          createdById: userId,
+        },
+      });
+
+      return project;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getProjects(userId: string, query: ProjectQueryDto) {
+    try {
+      const { page, limit, sortBy, sortOrder, search } = query;
+      const skip = (query.page - 1) * query.limit;
+      const orderBy = sortBy || 'createdAt';
+      const order = sortOrder || 'desc';
+
+      const filterCondition: Prisma.ProjectWhereInput = {
+        createdById: userId,
+      };
+      if (search) {
+        filterCondition.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      const total = await this.prisma.project.count({ where: filterCondition });
+
+      const projects = await this.prisma.project.findMany({
+        where: filterCondition,
+        include: {
+          tasks: true,
+          team: true,
+        },
+        orderBy: {
+          [orderBy]: order,
+        },
+        skip,
+        take: limit,
+      });
+
+      return {
+        data: projects,
+        meta: {
+          page,
+          limit,
+          skip,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getProjectById(userId: string, projectId: string) {
+    try {
+      const project = await this.prisma.project.findUnique({
+        where: { id: projectId, createdById: userId },
+        include: {
+          tasks: true,
+          team: true,
+          createdby: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              displayName: true,
+              photo: true,
+            },
+          },
+        },
+      });
+
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+
+      if (!project.isActive) {
+        throw new NotFoundException('Project is not active');
+      }
+
+      return project;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getProjectListWithMembers(userId: string) {
+    try {
+      const project = await this.prisma.project.findMany({
+        where: { createdById: userId },
+        select: {
+          id: true,
+          name: true,
+          team: {
+            select: {
+              members: {
+                select: {
+                  id: true,
+                  name: true,
+                  role: true,
+                  capacity: true,
+                  _count: {
+                    select: {
+                      tasks: {
+                        where: {
+                          NOT: {
+                            status: TaskStatus.DONE,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return project.map((project) => {
+        const { team, ...projectData } = project;
+
+        return {
+          ...projectData,
+          members: team.members.map((member) => {
+            const { _count, ...memberData } = member;
+
+            return {
+              ...memberData,
+              tasksCount: _count.tasks,
+            };
+          }),
+        };
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async updateProjectById(
+    userId: string,
+    projectId: string,
+    updateProjectDto: UpdateProjectDto,
+  ) {
+    try {
+      const project = await this.prisma.project.update({
+        where: { id: projectId, createdById: userId },
+        data: updateProjectDto,
+      });
+
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+
+      return project;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+}
