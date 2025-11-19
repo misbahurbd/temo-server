@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,6 +23,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { SessionUser } from '../auth/serializers/session.serializer';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
+import { GetTeamsQueryDto } from './dto/get-teams-query.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -48,19 +51,28 @@ export class TeamsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all teams' })
+  @ApiOperation({ summary: 'Get all teams with pagination and search' })
   @ApiResponse({
     status: 200,
     description: 'Teams fetched successfully',
-    type: [TeamResponseDto],
+    type: [TeamResponseWithMembersDto],
   })
   @UseGuards(AuthenticatedGuard)
   @ApiCookieAuth()
-  async getTeams(@Req() req: Request & { user: SessionUser }) {
-    const teams = await this.teamsService.getAllTeams(req.user.id);
+  async getTeams(
+    @Req() req: Request & { user: SessionUser },
+    @Query() query: GetTeamsQueryDto,
+  ) {
+    const result = await this.teamsService.getAllTeams(
+      req.user.id,
+      query.page ?? 1,
+      query.limit ?? 10,
+      query.search,
+    );
     return {
       message: 'Teams fetched successfully',
-      data: teams,
+      data: result.data as TeamResponseWithMembersDto[],
+      meta: result.meta,
     };
   }
 
@@ -105,6 +117,30 @@ export class TeamsController {
       updateTeamDto,
     );
 
+    return {
+      message: 'Team updated successfully',
+      data: team,
+    };
+  }
+
+  @Patch(':teamId')
+  @ApiOperation({ summary: 'Update a team by ID partially' })
+  @ApiResponse({
+    status: 200,
+    description: 'Team updated successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async updateTeamPartial(
+    @Req() req: Request & { user: SessionUser },
+    @Param('teamId') teamId: string,
+    @Body() updateTeamDto: Partial<UpdateTeamDto>,
+  ) {
+    const team = await this.teamsService.updateTeamPartial(
+      req.user.id,
+      teamId,
+      updateTeamDto,
+    );
     return {
       message: 'Team updated successfully',
       data: team,

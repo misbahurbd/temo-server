@@ -3,6 +3,8 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
+import { Prisma } from 'generated/prisma/client';
+import { Meta } from 'src/common/interfaces/response.interface';
 
 @Injectable()
 export class TeamsService {
@@ -38,13 +40,77 @@ export class TeamsService {
     }
   }
 
-  async getAllTeams(userId: string) {
+  async getAllTeams(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+  ): Promise<{
+    data: Prisma.TeamGetPayload<{
+      include: { members: true };
+    }>[];
+    meta: Meta;
+  }> {
     try {
+      const skip = (page - 1) * limit;
+
+      // Build where clause
+      const where: {
+        createdById: string;
+        isActive?: boolean;
+        OR?: Array<{
+          name?: { contains: string; mode?: 'insensitive' };
+          description?: { contains: string; mode?: 'insensitive' };
+        }>;
+      } = {
+        createdById: userId,
+        isActive: true,
+      };
+
+      // Add search filter if provided
+      if (search) {
+        where.OR = [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
+      // Get total count for pagination
+      const total = await this.prisma.team.count({ where });
+
+      // Get paginated teams
       const teams = await this.prisma.team.findMany({
-        where: { createdById: userId },
+        where,
+        include: {
+          members: true,
+        },
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
 
-      return teams;
+      return {
+        data: teams,
+        meta: {
+          page,
+          limit,
+          skip,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
     } catch (error) {
       this.logger.error(error);
       throw error;
@@ -91,13 +157,19 @@ export class TeamsService {
         data: {
           ...teamData,
           members: {
+            deleteMany: {
+              id: {
+                notIn: memberNeedToUpdate.map((member) => member.id ?? ''),
+              },
+              createdById: userId,
+              teamId: teamId,
+            },
             createMany: {
               data: memberNeedToCreate.map((member) => ({
                 name: member.name,
                 role: member.role,
                 capacity: member.capacity,
                 createdById: userId,
-                teamId: teamId,
               })),
             },
             updateMany: memberNeedToUpdate.map((member) => ({
@@ -108,18 +180,31 @@ export class TeamsService {
                 capacity: member.capacity,
               },
             })),
-            deleteMany: {
-              id: {
-                notIn: memberNeedToUpdate.map((member) => member.id ?? ''),
-              },
-              createdById: userId,
-              teamId: teamId,
-            },
           },
         },
         include: {
           members: true,
         },
+      });
+
+      return team;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async updateTeamPartial(
+    userId: string,
+    teamId: string,
+    updateTeamDto: Partial<
+      Pick<UpdateTeamDto, 'name' | 'description' | 'isActive'>
+    >,
+  ) {
+    try {
+      const team = await this.prisma.team.update({
+        where: { id: teamId, createdById: userId },
+        data: updateTeamDto,
       });
 
       return team;

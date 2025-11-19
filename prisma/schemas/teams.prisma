@@ -4,7 +4,8 @@ model Team {
   description String? @db.VarChar(255)
   isActive    Boolean @default(true)
 
-  members TeamMember[]
+  members  TeamMember[]
+  projects Project[]
 
   createdById String
   createdby   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
@@ -26,8 +27,13 @@ model TeamMember {
   isActive    Boolean @default(true)
   createdById String
 
+  tasks Task[]
+
   team      Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   createdby User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  assigneeTo   Activity[] @relation("AssigneeTo")
+  assigneeFrom Activity[] @relation("AssigneeFrom")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
