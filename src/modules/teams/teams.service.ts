@@ -3,7 +3,7 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
-import { Prisma } from 'generated/prisma/client';
+import { Prisma, TaskStatus } from 'generated/prisma/client';
 import { Meta } from 'src/common/interfaces/response.interface';
 import { TeamQueryDto } from './dto/team-query.dto';
 
@@ -307,6 +307,39 @@ export class TeamsService {
       }
 
       return member;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getMembersListWithCapacity(userId: string) {
+    try {
+      const members = await this.prisma.teamMember.findMany({
+        where: { createdById: userId },
+        select: {
+          id: true,
+          name: true,
+          capacity: true,
+          _count: {
+            select: {
+              tasks: {
+                where: {
+                  status: { not: TaskStatus.DONE },
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          capacity: 'desc',
+        },
+      });
+
+      return members.map((member) => ({
+        ...member,
+        tasksCount: member._count.tasks,
+      }));
     } catch (error) {
       this.logger.error(error);
       throw error;

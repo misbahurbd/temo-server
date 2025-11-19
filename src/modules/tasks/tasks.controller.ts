@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -16,6 +19,7 @@ import { Request } from 'express';
 import { SessionUser } from '../auth/serializers/session.serializer';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -60,6 +64,126 @@ export class TasksController {
       message: 'Tasks fetched successfully',
       data: tasks.data,
       meta: tasks.meta,
+    };
+  }
+
+  @Get('count')
+  @ApiOperation({ summary: 'Get task and project count' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Task and project count fetched successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getTaskAndProjectCount(@Req() req: Request & { user: SessionUser }) {
+    const { taskCount, projectCount } =
+      await this.tasksService.getTaskAndProjectCount(req.user.id);
+    return {
+      message: 'Task and project count fetched successfully',
+      data: { taskCount, projectCount },
+    };
+  }
+
+  @Get('activity-log')
+  @ApiOperation({ summary: 'Get task activity log' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Activity log fetched successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getTaskActivityLog(@Req() req: Request & { user: SessionUser }) {
+    const activityLog = await this.tasksService.getTaskActivityLog(req.user.id);
+    return {
+      message: 'Activity log fetched successfully',
+      data: activityLog,
+    };
+  }
+
+  @Get(':taskId')
+  @ApiOperation({ summary: 'Get a task by ID' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Task fetched successfully',
+    type: TaskResponseDto,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getTask(
+    @Req() req: Request & { user: SessionUser },
+    @Param('taskId') taskId: string,
+  ) {
+    const task = await this.tasksService.getTaskById(req.user.id, taskId);
+    return {
+      message: 'Task fetched successfully',
+      data: task,
+    };
+  }
+
+  @Put(':taskId')
+  @ApiOperation({ summary: 'Update a task by ID' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Task updated successfully',
+    type: TaskResponseDto,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async updateTask(
+    @Req() req: Request & { user: SessionUser },
+    @Param('taskId') taskId: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    const task = await this.tasksService.updateTask(
+      req.user.id,
+      taskId,
+      updateTaskDto,
+    );
+    return {
+      message: 'Task updated successfully',
+      data: task,
+    };
+  }
+
+  @Delete(':taskId')
+  @ApiOperation({ summary: 'Delete a task by ID' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Task deleted successfully',
+    type: TaskResponseDto,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async deleteTask(
+    @Req() req: Request & { user: SessionUser },
+    @Param('taskId') taskId: string,
+  ) {
+    await this.tasksService.deleteTask(req.user.id, taskId);
+    return {
+      message: 'Task deleted successfully',
+    };
+  }
+
+  @Post('reassign/:projectId')
+  @ApiOperation({ summary: 'Auto reassign tasks for a project' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Tasks reassigned successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async reassignTasks(
+    @Req() req: Request & { user: SessionUser },
+    @Param('projectId') projectId: string,
+  ) {
+    const result = await this.tasksService.reassignTasks(
+      req.user.id,
+      projectId,
+    );
+    return {
+      message: result.message,
+      data: result.reassignments,
+      meta: result.summary,
     };
   }
 }

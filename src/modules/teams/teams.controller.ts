@@ -96,6 +96,28 @@ export class TeamsController {
     };
   }
 
+  @Get('members')
+  @ApiOperation({ summary: 'Get all members with capacity' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Members fetched successfully',
+    type: TeamMemberResponseDto,
+    isArray: true,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getMembersListWithCapacity(
+    @Req() req: Request & { user: SessionUser },
+  ) {
+    const members = await this.teamsService.getMembersListWithCapacity(
+      req.user.id,
+    );
+    return {
+      message: 'Members fetched successfully',
+      data: members,
+    };
+  }
+
   @Get(':teamId')
   @ApiOperation({ summary: 'Get a team by ID with its members' })
   @ApiSuccessResponse({

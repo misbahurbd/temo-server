@@ -1,6 +1,52 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TaskPriority, TaskStatus } from 'generated/prisma/enums';
 
+export class ProjectResponseDto {
+  @ApiProperty({
+    description: 'The ID of the project',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: true,
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'The name of the project',
+    example: 'Project 1',
+    required: true,
+  })
+  name: string;
+}
+
+export class AssigneeResponseDto {
+  @ApiProperty({
+    description: 'The ID of the assignee',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: true,
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'The name of the assignee',
+    example: 'John Doe',
+    required: true,
+  })
+  name: string;
+
+  @ApiProperty({
+    description: 'The capacity of the assignee',
+    example: 1,
+    required: true,
+  })
+  capacity: number;
+
+  @ApiProperty({
+    description: 'The tasks count of the assignee',
+    example: 0,
+    required: true,
+  })
+  tasksCount: number;
+}
+
 export class TaskResponseDto {
   @ApiProperty({
     description: 'The ID of the task',
@@ -57,6 +103,20 @@ export class TaskResponseDto {
     required: true,
   })
   projectId: string;
+
+  @ApiProperty({
+    description: 'The project of the task',
+    type: ProjectResponseDto,
+    required: true,
+  })
+  project: ProjectResponseDto;
+
+  @ApiProperty({
+    description: 'The assignee of the task',
+    type: AssigneeResponseDto,
+    required: true,
+  })
+  assignee: AssigneeResponseDto;
 
   @ApiProperty({
     description: 'The created at timestamp',
