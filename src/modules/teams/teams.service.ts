@@ -3,6 +3,9 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
+import { Prisma } from 'generated/prisma/client';
+import { Meta } from 'src/common/interfaces/response.interface';
+import { TeamQueryDto } from './dto/team-query.dto';
 
 @Injectable()
 export class TeamsService {
@@ -38,13 +41,95 @@ export class TeamsService {
     }
   }
 
-  async getAllTeams(userId: string) {
+  async getAllTeams(
+    userId: string,
+    query: TeamQueryDto,
+  ): Promise<{
+    data: Prisma.TeamGetPayload<{
+      include: { members: true };
+    }>[];
+    meta: Meta;
+  }> {
+    try {
+      const { page, limit, sortBy, sortOrder, search } = query;
+      const skip = (query.page - 1) * query.limit;
+      const orderBy = sortBy || 'createdAt';
+      const order = sortOrder || 'asc';
+
+      const filterCondition: Prisma.TeamWhereInput = {
+        createdById: userId,
+      };
+
+      // Add search filter if provided
+      if (search) {
+        filterCondition.OR = [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
+      // Get total count for pagination
+      const total = await this.prisma.team.count({ where: filterCondition });
+
+      // Get paginated teams
+      const teams = await this.prisma.team.findMany({
+        where: filterCondition,
+        include: {
+          members: true,
+        },
+        skip,
+        take: limit,
+        orderBy: {
+          [orderBy]: order,
+        },
+      });
+
+      return {
+        data: teams,
+        meta: {
+          page,
+          limit,
+          skip,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getTeamsSelectList(userId: string) {
     try {
       const teams = await this.prisma.team.findMany({
         where: { createdById: userId },
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              members: true,
+            },
+          },
+        },
       });
 
-      return teams;
+      return teams.map((team) => ({
+        id: team.id,
+        name: team.name,
+        membersCount: team._count.members,
+      }));
     } catch (error) {
       this.logger.error(error);
       throw error;
@@ -91,13 +176,19 @@ export class TeamsService {
         data: {
           ...teamData,
           members: {
+            deleteMany: {
+              id: {
+                notIn: memberNeedToUpdate.map((member) => member.id ?? ''),
+              },
+              createdById: userId,
+              teamId: teamId,
+            },
             createMany: {
               data: memberNeedToCreate.map((member) => ({
                 name: member.name,
                 role: member.role,
                 capacity: member.capacity,
                 createdById: userId,
-                teamId: teamId,
               })),
             },
             updateMany: memberNeedToUpdate.map((member) => ({
@@ -108,18 +199,31 @@ export class TeamsService {
                 capacity: member.capacity,
               },
             })),
-            deleteMany: {
-              id: {
-                notIn: memberNeedToUpdate.map((member) => member.id ?? ''),
-              },
-              createdById: userId,
-              teamId: teamId,
-            },
           },
         },
         include: {
           members: true,
         },
+      });
+
+      return team;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async updateTeamPartial(
+    userId: string,
+    teamId: string,
+    updateTeamDto: Partial<
+      Pick<UpdateTeamDto, 'name' | 'description' | 'isActive'>
+    >,
+  ) {
+    try {
+      const team = await this.prisma.team.update({
+        where: { id: teamId, createdById: userId },
+        data: updateTeamDto,
       });
 
       return team;

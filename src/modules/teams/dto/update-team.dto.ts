@@ -34,7 +34,7 @@ export class UpdateTeamDto {
   })
   @IsBoolean()
   @IsOptional()
-  isActive: boolean;
+  isActive?: boolean;
 
   @ApiProperty({
     description: 'The array of team members',
