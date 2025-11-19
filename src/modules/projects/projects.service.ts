@@ -188,14 +188,59 @@ export class ProjectsService {
     try {
       const project = await this.prisma.project.findUnique({
         where: { id: projectId, createdById: userId },
-        include: { tasks: { include: { assignee: true } } },
+        include: {
+          tasks: {
+            include: {
+              assignee: {
+                select: {
+                  id: true,
+                  name: true,
+                  capacity: true,
+                  _count: {
+                    select: {
+                      tasks: { where: { status: { not: TaskStatus.DONE } } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!project) {
         throw new NotFoundException('Project not found');
       }
 
-      return project;
+      return {
+        ...project,
+        tasks: project.tasks.map((task) => ({
+          ...task,
+          assignee: task.assignee
+            ? {
+                id: task.assignee.id,
+                name: task.assignee.name,
+                capacity: task.assignee.capacity,
+                tasksCount: task.assignee._count.tasks,
+              }
+            : null,
+        })),
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async projectSelectList(userId: string) {
+    try {
+      const projects = await this.prisma.project.findMany({
+        where: { createdById: userId },
+        select: { id: true, name: true },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return projects;
     } catch (error) {
       this.logger.error(error);
       throw error;

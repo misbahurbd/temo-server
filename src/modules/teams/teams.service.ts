@@ -345,4 +345,19 @@ export class TeamsService {
       throw error;
     }
   }
+
+  async memberSelectList(userId: string) {
+    try {
+      const members = await this.prisma.teamMember.findMany({
+        where: { createdById: userId },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+      });
+
+      return members;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
 }

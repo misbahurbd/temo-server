@@ -144,3 +144,19 @@ export class TeamSelectListResponseDto {
   })
   membersCount: number;
 }
+
+export class TeamMemberSelectListResponseDto {
+  @ApiProperty({
+    description: 'The ID of the team member',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: true,
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'The name of the team member',
+    example: 'John Doe',
+    required: true,
+  })
+  name: string;
+}

@@ -15,6 +15,7 @@ import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import {
   TeamMemberResponseDto,
+  TeamMemberSelectListResponseDto,
   TeamResponseDto,
   TeamResponseWithMembersDto,
   TeamSelectListResponseDto,
@@ -118,6 +119,23 @@ export class TeamsController {
     };
   }
 
+  @Get('members/select-list')
+  @ApiOperation({ summary: 'Get all members select list' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Members fetched successfully',
+    type: TeamMemberSelectListResponseDto,
+    isArray: true,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getMembersSelectList(@Req() req: Request & { user: SessionUser }) {
+    const result = await this.teamsService.memberSelectList(req.user.id);
+    return {
+      message: 'Members fetched successfully',
+      data: result,
+    };
+  }
   @Get(':teamId')
   @ApiOperation({ summary: 'Get a team by ID with its members' })
   @ApiSuccessResponse({

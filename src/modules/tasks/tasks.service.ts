@@ -9,6 +9,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
 import { Prisma, TaskPriority, TaskStatus } from 'generated/prisma/client';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskActivityQueryDto } from './dto/task-activity-query.dto';
 
 @Injectable()
 export class TasksService {
@@ -477,27 +478,29 @@ export class TasksService {
       }));
 
       // Perform all updates in a transaction
-      await this.prisma.$transaction(async (tx) => {
-        // Batch update tasks grouped by new assigneeId
-        await Promise.all(
-          Array.from(taskUpdatesByAssignee.entries()).map(
-            ([newAssigneeId, taskIds]) =>
-              tx.task.updateMany({
-                where: {
-                  id: { in: taskIds },
-                },
-                data: { assigneeId: newAssigneeId },
-              }),
-          ),
-        );
+      if (overloadedMembers.length !== 0) {
+        await this.prisma.$transaction(async (tx) => {
+          // Batch update tasks grouped by new assigneeId
+          await Promise.all(
+            Array.from(taskUpdatesByAssignee.entries()).map(
+              ([newAssigneeId, taskIds]) =>
+                tx.task.updateMany({
+                  where: {
+                    id: { in: taskIds },
+                  },
+                  data: { assigneeId: newAssigneeId },
+                }),
+            ),
+          );
 
-        // Batch create all activities
-        if (activityCreates.length > 0) {
-          await tx.activity.createMany({
-            data: activityCreates,
-          });
-        }
-      });
+          // Batch create all activities
+          if (activityCreates.length > 0) {
+            await tx.activity.createMany({
+              data: activityCreates,
+            });
+          }
+        });
+      }
 
       // Build reassignments response
       const reassignments = taskUpdates.map((update) => ({
@@ -559,6 +562,100 @@ export class TasksService {
       });
 
       return activityLog;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async getTaskActivityWithPagination(
+    userId: string,
+    query: TaskActivityQueryDto,
+  ) {
+    try {
+      const page = query.page ? query.page : 1;
+      const limit = query.limit ? query.limit : 10;
+      const skip = (page - 1) * limit;
+      const orderBy = query.sortBy ? query.sortBy : 'createdAt';
+      const order = query.sortOrder ? query.sortOrder : 'desc';
+
+      const filterCondition: Prisma.ActivityWhereInput = {
+        userId,
+      };
+
+      if (query.search) {
+        filterCondition.OR = [
+          { task: { name: { contains: query.search, mode: 'insensitive' } } },
+          {
+            assigneeFrom: {
+              name: { contains: query.search, mode: 'insensitive' },
+            },
+          },
+          {
+            assigneeTo: {
+              name: { contains: query.search, mode: 'insensitive' },
+            },
+          },
+          {
+            task: {
+              project: {
+                name: { contains: query.search, mode: 'insensitive' },
+              },
+            },
+          },
+          {
+            task: {
+              assignee: {
+                name: { contains: query.search, mode: 'insensitive' },
+              },
+            },
+          },
+        ];
+      }
+
+      const total = await this.prisma.activity.count({
+        where: filterCondition,
+      });
+
+      const activityLog = await this.prisma.activity.findMany({
+        where: filterCondition,
+        skip,
+        take: limit,
+        orderBy: {
+          [orderBy]: order,
+        },
+        include: {
+          task: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          assigneeFrom: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          assigneeTo: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      return {
+        data: activityLog,
+        meta: {
+          page,
+          limit,
+          skip,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
     } catch (error) {
       this.logger.error(error);
       throw error;

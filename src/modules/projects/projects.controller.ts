@@ -22,6 +22,7 @@ import {
 import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.decorator';
 import { ProjectQueryDto } from './dto/project-query.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectSelectListResponseDto } from './dto/project-select-list.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -70,6 +71,23 @@ export class ProjectsController {
       message: 'Projects fetched successfully',
       data: result.data,
       meta: result.meta,
+    };
+  }
+
+  @Get('select-list')
+  @ApiOperation({ summary: 'Get all projects select list' })
+  @ApiSuccessResponse({
+    type: ProjectSelectListResponseDto,
+    description: 'Projects select list fetched successfully',
+    isArray: true,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getProjectSelectList(@Req() req: Request & { user: SessionUser }) {
+    const result = await this.projectsService.projectSelectList(req.user.id);
+    return {
+      message: 'Projects select list fetched successfully',
+      data: result,
     };
   }
 

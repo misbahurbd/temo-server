@@ -20,6 +20,7 @@ import { SessionUser } from '../auth/serializers/session.serializer';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskActivityQueryDto } from './dto/task-activity-query.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -97,6 +98,31 @@ export class TasksController {
     return {
       message: 'Activity log fetched successfully',
       data: activityLog,
+    };
+  }
+
+  @Get('activities')
+  @ApiOperation({ summary: 'Get task activities with pagination' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Task activities fetched successfully',
+    isArray: true,
+    withMeta: true,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getTaskActivityLogWithPagination(
+    @Req() req: Request & { user: SessionUser },
+    @Query() query: TaskActivityQueryDto,
+  ) {
+    const activityLog = await this.tasksService.getTaskActivityWithPagination(
+      req.user.id,
+      query,
+    );
+    return {
+      message: 'Activity log fetched successfully',
+      data: activityLog.data,
+      meta: activityLog.meta,
     };
   }
 
