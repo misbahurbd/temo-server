@@ -23,6 +23,7 @@ import { ApiSuccessResponse } from 'src/common/decorators/api-success-response.d
 import { ProjectQueryDto } from './dto/project-query.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectSelectListResponseDto } from './dto/project-select-list.dto';
+import { TaskQueryDto } from '../tasks/dto/task-query.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -139,20 +140,24 @@ export class ProjectsController {
   @ApiSuccessResponse({
     type: ProjectResponseDto,
     description: 'Project fetched successfully',
+    withMeta: true,
   })
   @UseGuards(AuthenticatedGuard)
   @ApiCookieAuth()
   async getProjectByIdWithTasks(
     @Req() req: Request & { user: SessionUser },
     @Param('projectId') projectId: string,
+    @Query() query: TaskQueryDto,
   ) {
     const project = await this.projectsService.projectByIdWithTasks(
       req.user.id,
       projectId,
+      query,
     );
     return {
       message: 'Project fetched successfully',
-      data: project,
+      data: project.data,
+      meta: project.meta,
     };
   }
 

@@ -28,8 +28,11 @@ export type ActivityMinAggregateOutputType = {
   id: string | null
   taskId: string | null
   userId: string | null
+  fromValue: string | null
+  toValue: string | null
   assigneeToId: string | null
   assigneeFromId: string | null
+  activityType: $Enums.ActivityType | null
   createdAt: Date | null
 }
 
@@ -37,8 +40,11 @@ export type ActivityMaxAggregateOutputType = {
   id: string | null
   taskId: string | null
   userId: string | null
+  fromValue: string | null
+  toValue: string | null
   assigneeToId: string | null
   assigneeFromId: string | null
+  activityType: $Enums.ActivityType | null
   createdAt: Date | null
 }
 
@@ -46,8 +52,11 @@ export type ActivityCountAggregateOutputType = {
   id: number
   taskId: number
   userId: number
+  fromValue: number
+  toValue: number
   assigneeToId: number
   assigneeFromId: number
+  activityType: number
   createdAt: number
   _all: number
 }
@@ -57,8 +66,11 @@ export type ActivityMinAggregateInputType = {
   id?: true
   taskId?: true
   userId?: true
+  fromValue?: true
+  toValue?: true
   assigneeToId?: true
   assigneeFromId?: true
+  activityType?: true
   createdAt?: true
 }
 
@@ -66,8 +78,11 @@ export type ActivityMaxAggregateInputType = {
   id?: true
   taskId?: true
   userId?: true
+  fromValue?: true
+  toValue?: true
   assigneeToId?: true
   assigneeFromId?: true
+  activityType?: true
   createdAt?: true
 }
 
@@ -75,8 +90,11 @@ export type ActivityCountAggregateInputType = {
   id?: true
   taskId?: true
   userId?: true
+  fromValue?: true
+  toValue?: true
   assigneeToId?: true
   assigneeFromId?: true
+  activityType?: true
   createdAt?: true
   _all?: true
 }
@@ -157,8 +175,11 @@ export type ActivityGroupByOutputType = {
   id: string
   taskId: string
   userId: string
-  assigneeToId: string
+  fromValue: string | null
+  toValue: string | null
+  assigneeToId: string | null
   assigneeFromId: string | null
+  activityType: $Enums.ActivityType
   createdAt: Date
   _count: ActivityCountAggregateOutputType | null
   _min: ActivityMinAggregateOutputType | null
@@ -187,12 +208,15 @@ export type ActivityWhereInput = {
   id?: Prisma.StringFilter<"Activity"> | string
   taskId?: Prisma.StringFilter<"Activity"> | string
   userId?: Prisma.StringFilter<"Activity"> | string
-  assigneeToId?: Prisma.StringFilter<"Activity"> | string
+  fromValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  toValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  assigneeToId?: Prisma.StringNullableFilter<"Activity"> | string | null
   assigneeFromId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  activityType?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   task?: Prisma.XOR<Prisma.TaskScalarRelationFilter, Prisma.TaskWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  assigneeTo?: Prisma.XOR<Prisma.TeamMemberScalarRelationFilter, Prisma.TeamMemberWhereInput>
+  assigneeTo?: Prisma.XOR<Prisma.TeamMemberNullableScalarRelationFilter, Prisma.TeamMemberWhereInput> | null
   assigneeFrom?: Prisma.XOR<Prisma.TeamMemberNullableScalarRelationFilter, Prisma.TeamMemberWhereInput> | null
 }
 
@@ -200,8 +224,11 @@ export type ActivityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  assigneeToId?: Prisma.SortOrder
+  fromValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  toValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  assigneeToId?: Prisma.SortOrderInput | Prisma.SortOrder
   assigneeFromId?: Prisma.SortOrderInput | Prisma.SortOrder
+  activityType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   task?: Prisma.TaskOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -216,12 +243,15 @@ export type ActivityWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ActivityWhereInput | Prisma.ActivityWhereInput[]
   taskId?: Prisma.StringFilter<"Activity"> | string
   userId?: Prisma.StringFilter<"Activity"> | string
-  assigneeToId?: Prisma.StringFilter<"Activity"> | string
+  fromValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  toValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  assigneeToId?: Prisma.StringNullableFilter<"Activity"> | string | null
   assigneeFromId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  activityType?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   task?: Prisma.XOR<Prisma.TaskScalarRelationFilter, Prisma.TaskWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  assigneeTo?: Prisma.XOR<Prisma.TeamMemberScalarRelationFilter, Prisma.TeamMemberWhereInput>
+  assigneeTo?: Prisma.XOR<Prisma.TeamMemberNullableScalarRelationFilter, Prisma.TeamMemberWhereInput> | null
   assigneeFrom?: Prisma.XOR<Prisma.TeamMemberNullableScalarRelationFilter, Prisma.TeamMemberWhereInput> | null
 }, "id">
 
@@ -229,8 +259,11 @@ export type ActivityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  assigneeToId?: Prisma.SortOrder
+  fromValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  toValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  assigneeToId?: Prisma.SortOrderInput | Prisma.SortOrder
   assigneeFromId?: Prisma.SortOrderInput | Prisma.SortOrder
+  activityType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ActivityCountOrderByAggregateInput
   _max?: Prisma.ActivityMaxOrderByAggregateInput
@@ -244,17 +277,23 @@ export type ActivityScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Activity"> | string
   taskId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
-  assigneeToId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
+  fromValue?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
+  toValue?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
+  assigneeToId?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   assigneeFromId?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
+  activityType?: Prisma.EnumActivityTypeWithAggregatesFilter<"Activity"> | $Enums.ActivityType
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Activity"> | Date | string
 }
 
 export type ActivityCreateInput = {
   id?: string
+  fromValue?: string | null
+  toValue?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
   task: Prisma.TaskCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
-  assigneeTo: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
+  assigneeTo?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
   assigneeFrom?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeFromInput
 }
 
@@ -262,17 +301,23 @@ export type ActivityUncheckedCreateInput = {
   id?: string
   taskId: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
 export type ActivityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   task?: Prisma.TaskUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
-  assigneeTo?: Prisma.TeamMemberUpdateOneRequiredWithoutAssigneeToNestedInput
+  assigneeTo?: Prisma.TeamMemberUpdateOneWithoutAssigneeToNestedInput
   assigneeFrom?: Prisma.TeamMemberUpdateOneWithoutAssigneeFromNestedInput
 }
 
@@ -280,8 +325,11 @@ export type ActivityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -289,13 +337,19 @@ export type ActivityCreateManyInput = {
   id?: string
   taskId: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
 export type ActivityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -303,8 +357,11 @@ export type ActivityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -312,8 +369,11 @@ export type ActivityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  fromValue?: Prisma.SortOrder
+  toValue?: Prisma.SortOrder
   assigneeToId?: Prisma.SortOrder
   assigneeFromId?: Prisma.SortOrder
+  activityType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -321,8 +381,11 @@ export type ActivityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  fromValue?: Prisma.SortOrder
+  toValue?: Prisma.SortOrder
   assigneeToId?: Prisma.SortOrder
   assigneeFromId?: Prisma.SortOrder
+  activityType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -330,8 +393,11 @@ export type ActivityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  fromValue?: Prisma.SortOrder
+  toValue?: Prisma.SortOrder
   assigneeToId?: Prisma.SortOrder
   assigneeFromId?: Prisma.SortOrder
+  activityType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -349,12 +415,16 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type EnumActivityTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ActivityType
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type ActivityCreateNestedManyWithoutTaskInput = {
@@ -527,17 +597,23 @@ export type ActivityUncheckedUpdateManyWithoutUserNestedInput = {
 
 export type ActivityCreateWithoutTaskInput = {
   id?: string
+  fromValue?: string | null
+  toValue?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
-  assigneeTo: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
+  assigneeTo?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
   assigneeFrom?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeFromInput
 }
 
 export type ActivityUncheckedCreateWithoutTaskInput = {
   id?: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
@@ -574,13 +650,19 @@ export type ActivityScalarWhereInput = {
   id?: Prisma.StringFilter<"Activity"> | string
   taskId?: Prisma.StringFilter<"Activity"> | string
   userId?: Prisma.StringFilter<"Activity"> | string
-  assigneeToId?: Prisma.StringFilter<"Activity"> | string
+  fromValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  toValue?: Prisma.StringNullableFilter<"Activity"> | string | null
+  assigneeToId?: Prisma.StringNullableFilter<"Activity"> | string | null
   assigneeFromId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  activityType?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
 }
 
 export type ActivityCreateWithoutAssigneeToInput = {
   id?: string
+  fromValue?: string | null
+  toValue?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
   task: Prisma.TaskCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
@@ -591,7 +673,10 @@ export type ActivityUncheckedCreateWithoutAssigneeToInput = {
   id?: string
   taskId: string
   userId: string
+  fromValue?: string | null
+  toValue?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
@@ -607,17 +692,23 @@ export type ActivityCreateManyAssigneeToInputEnvelope = {
 
 export type ActivityCreateWithoutAssigneeFromInput = {
   id?: string
+  fromValue?: string | null
+  toValue?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
   task: Prisma.TaskCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
-  assigneeTo: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
+  assigneeTo?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
 }
 
 export type ActivityUncheckedCreateWithoutAssigneeFromInput = {
   id?: string
   taskId: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
@@ -665,17 +756,23 @@ export type ActivityUpdateManyWithWhereWithoutAssigneeFromInput = {
 
 export type ActivityCreateWithoutUserInput = {
   id?: string
+  fromValue?: string | null
+  toValue?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
   task: Prisma.TaskCreateNestedOneWithoutActivitiesInput
-  assigneeTo: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
+  assigneeTo?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeToInput
   assigneeFrom?: Prisma.TeamMemberCreateNestedOneWithoutAssigneeFromInput
 }
 
 export type ActivityUncheckedCreateWithoutUserInput = {
   id?: string
   taskId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
@@ -708,32 +805,44 @@ export type ActivityUpdateManyWithWhereWithoutUserInput = {
 export type ActivityCreateManyTaskInput = {
   id?: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
 export type ActivityUpdateWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
-  assigneeTo?: Prisma.TeamMemberUpdateOneRequiredWithoutAssigneeToNestedInput
+  assigneeTo?: Prisma.TeamMemberUpdateOneWithoutAssigneeToNestedInput
   assigneeFrom?: Prisma.TeamMemberUpdateOneWithoutAssigneeFromNestedInput
 }
 
 export type ActivityUncheckedUpdateWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ActivityUncheckedUpdateManyWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -741,7 +850,10 @@ export type ActivityCreateManyAssigneeToInput = {
   id?: string
   taskId: string
   userId: string
+  fromValue?: string | null
+  toValue?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
@@ -749,12 +861,18 @@ export type ActivityCreateManyAssigneeFromInput = {
   id?: string
   taskId: string
   userId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
 export type ActivityUpdateWithoutAssigneeToInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   task?: Prisma.TaskUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
@@ -765,7 +883,10 @@ export type ActivityUncheckedUpdateWithoutAssigneeToInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -773,23 +894,32 @@ export type ActivityUncheckedUpdateManyWithoutAssigneeToInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ActivityUpdateWithoutAssigneeFromInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   task?: Prisma.TaskUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
-  assigneeTo?: Prisma.TeamMemberUpdateOneRequiredWithoutAssigneeToNestedInput
+  assigneeTo?: Prisma.TeamMemberUpdateOneWithoutAssigneeToNestedInput
 }
 
 export type ActivityUncheckedUpdateWithoutAssigneeFromInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -797,39 +927,54 @@ export type ActivityUncheckedUpdateManyWithoutAssigneeFromInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ActivityCreateManyUserInput = {
   id?: string
   taskId: string
-  assigneeToId: string
+  fromValue?: string | null
+  toValue?: string | null
+  assigneeToId?: string | null
   assigneeFromId?: string | null
+  activityType?: $Enums.ActivityType
   createdAt?: Date | string
 }
 
 export type ActivityUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   task?: Prisma.TaskUpdateOneRequiredWithoutActivitiesNestedInput
-  assigneeTo?: Prisma.TeamMemberUpdateOneRequiredWithoutAssigneeToNestedInput
+  assigneeTo?: Prisma.TeamMemberUpdateOneWithoutAssigneeToNestedInput
   assigneeFrom?: Prisma.TeamMemberUpdateOneWithoutAssigneeFromNestedInput
 }
 
 export type ActivityUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ActivityUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.StringFieldUpdateOperationsInput | string
-  assigneeToId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assigneeToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assigneeFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activityType?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -839,12 +984,15 @@ export type ActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   taskId?: boolean
   userId?: boolean
+  fromValue?: boolean
+  toValue?: boolean
   assigneeToId?: boolean
   assigneeFromId?: boolean
+  activityType?: boolean
   createdAt?: boolean
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -852,12 +1000,15 @@ export type ActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   taskId?: boolean
   userId?: boolean
+  fromValue?: boolean
+  toValue?: boolean
   assigneeToId?: boolean
   assigneeFromId?: boolean
+  activityType?: boolean
   createdAt?: boolean
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -865,12 +1016,15 @@ export type ActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   taskId?: boolean
   userId?: boolean
+  fromValue?: boolean
+  toValue?: boolean
   assigneeToId?: boolean
   assigneeFromId?: boolean
+  activityType?: boolean
   createdAt?: boolean
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -878,28 +1032,31 @@ export type ActivitySelectScalar = {
   id?: boolean
   taskId?: boolean
   userId?: boolean
+  fromValue?: boolean
+  toValue?: boolean
   assigneeToId?: boolean
   assigneeFromId?: boolean
+  activityType?: boolean
   createdAt?: boolean
 }
 
-export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "taskId" | "userId" | "assigneeToId" | "assigneeFromId" | "createdAt", ExtArgs["result"]["activity"]>
+export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "taskId" | "userId" | "fromValue" | "toValue" | "assigneeToId" | "assigneeFromId" | "activityType" | "createdAt", ExtArgs["result"]["activity"]>
 export type ActivityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }
 export type ActivityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }
 export type ActivityIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   task?: boolean | Prisma.TaskDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assigneeTo?: boolean | Prisma.TeamMemberDefaultArgs<ExtArgs>
+  assigneeTo?: boolean | Prisma.Activity$assigneeToArgs<ExtArgs>
   assigneeFrom?: boolean | Prisma.Activity$assigneeFromArgs<ExtArgs>
 }
 
@@ -908,15 +1065,18 @@ export type $ActivityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     task: Prisma.$TaskPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
-    assigneeTo: Prisma.$TeamMemberPayload<ExtArgs>
+    assigneeTo: Prisma.$TeamMemberPayload<ExtArgs> | null
     assigneeFrom: Prisma.$TeamMemberPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     taskId: string
     userId: string
-    assigneeToId: string
+    fromValue: string | null
+    toValue: string | null
+    assigneeToId: string | null
     assigneeFromId: string | null
+    activityType: $Enums.ActivityType
     createdAt: Date
   }, ExtArgs["result"]["activity"]>
   composites: {}
@@ -1314,7 +1474,7 @@ export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   task<T extends Prisma.TaskDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TaskDefaultArgs<ExtArgs>>): Prisma.Prisma__TaskClient<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  assigneeTo<T extends Prisma.TeamMemberDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeamMemberDefaultArgs<ExtArgs>>): Prisma.Prisma__TeamMemberClient<runtime.Types.Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assigneeTo<T extends Prisma.Activity$assigneeToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Activity$assigneeToArgs<ExtArgs>>): Prisma.Prisma__TeamMemberClient<runtime.Types.Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assigneeFrom<T extends Prisma.Activity$assigneeFromArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Activity$assigneeFromArgs<ExtArgs>>): Prisma.Prisma__TeamMemberClient<runtime.Types.Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1348,8 +1508,11 @@ export interface ActivityFieldRefs {
   readonly id: Prisma.FieldRef<"Activity", 'String'>
   readonly taskId: Prisma.FieldRef<"Activity", 'String'>
   readonly userId: Prisma.FieldRef<"Activity", 'String'>
+  readonly fromValue: Prisma.FieldRef<"Activity", 'String'>
+  readonly toValue: Prisma.FieldRef<"Activity", 'String'>
   readonly assigneeToId: Prisma.FieldRef<"Activity", 'String'>
   readonly assigneeFromId: Prisma.FieldRef<"Activity", 'String'>
+  readonly activityType: Prisma.FieldRef<"Activity", 'ActivityType'>
   readonly createdAt: Prisma.FieldRef<"Activity", 'DateTime'>
 }
     
@@ -1744,6 +1907,25 @@ export type ActivityDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Activities to delete.
    */
   limit?: number
+}
+
+/**
+ * Activity.assigneeTo
+ */
+export type Activity$assigneeToArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamMember
+   */
+  select?: Prisma.TeamMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamMember
+   */
+  omit?: Prisma.TeamMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamMemberInclude<ExtArgs> | null
+  where?: Prisma.TeamMemberWhereInput
 }
 
 /**

@@ -9,6 +9,20 @@
 * 🟢 You can import this file directly.
 */
 
+export const ActivityType = {
+  TASK_CREATED: 'TASK_CREATED',
+  TASK_UPDATED: 'TASK_UPDATED',
+  TASK_STATUS_UPDATED: 'TASK_STATUS_UPDATED',
+  TASK_PRIORITY_UPDATED: 'TASK_PRIORITY_UPDATED',
+  TASK_DUE_DATE_UPDATED: 'TASK_DUE_DATE_UPDATED',
+  TASK_ASSIGNED: 'TASK_ASSIGNED',
+  TASK_UNASSIGNED: 'TASK_UNASSIGNED',
+  TASK_REASSIGNED: 'TASK_REASSIGNED'
+} as const
+
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
+
+
 export const TaskStatus = {
   PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',

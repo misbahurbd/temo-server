@@ -418,11 +418,6 @@ export type TeamMemberUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type TeamMemberScalarRelationFilter = {
-  is?: Prisma.TeamMemberWhereInput
-  isNot?: Prisma.TeamMemberWhereInput
-}
-
 export type TeamMemberNullableScalarRelationFilter = {
   is?: Prisma.TeamMemberWhereInput | null
   isNot?: Prisma.TeamMemberWhereInput | null
@@ -494,10 +489,12 @@ export type TeamMemberCreateNestedOneWithoutAssigneeFromInput = {
   connect?: Prisma.TeamMemberWhereUniqueInput
 }
 
-export type TeamMemberUpdateOneRequiredWithoutAssigneeToNestedInput = {
+export type TeamMemberUpdateOneWithoutAssigneeToNestedInput = {
   create?: Prisma.XOR<Prisma.TeamMemberCreateWithoutAssigneeToInput, Prisma.TeamMemberUncheckedCreateWithoutAssigneeToInput>
   connectOrCreate?: Prisma.TeamMemberCreateOrConnectWithoutAssigneeToInput
   upsert?: Prisma.TeamMemberUpsertWithoutAssigneeToInput
+  disconnect?: Prisma.TeamMemberWhereInput | boolean
+  delete?: Prisma.TeamMemberWhereInput | boolean
   connect?: Prisma.TeamMemberWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeamMemberUpdateToOneWithWhereWithoutAssigneeToInput, Prisma.TeamMemberUpdateWithoutAssigneeToInput>, Prisma.TeamMemberUncheckedUpdateWithoutAssigneeToInput>
 }

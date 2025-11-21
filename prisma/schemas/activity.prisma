@@ -1,3 +1,14 @@
+enum ActivityType {
+    TASK_CREATED
+    TASK_UPDATED
+    TASK_STATUS_UPDATED
+    TASK_PRIORITY_UPDATED
+    TASK_DUE_DATE_UPDATED
+    TASK_ASSIGNED
+    TASK_UNASSIGNED
+    TASK_REASSIGNED
+}
+
 model Activity {
     id String @id @default(uuid())
 
@@ -7,11 +18,16 @@ model Activity {
     userId String
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    assigneeToId String
-    assigneeTo   TeamMember @relation("AssigneeTo", fields: [assigneeToId], references: [id])
+    fromValue String?
+    toValue String?
+
+    assigneeToId String?
+    assigneeTo   TeamMember? @relation("AssigneeTo", fields: [assigneeToId], references: [id])
 
     assigneeFromId String?
     assigneeFrom   TeamMember? @relation("AssigneeFrom", fields: [assigneeFromId], references: [id])
+
+    activityType ActivityType @default(TASK_CREATED)
 
     createdAt DateTime @default(now())
 

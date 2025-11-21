@@ -326,6 +326,10 @@ export class TeamsService {
               tasks: {
                 where: {
                   status: { not: TaskStatus.DONE },
+                  assigneeId: { not: null },
+                  assignee: {
+                    isActive: true,
+                  },
                 },
               },
             },
@@ -335,6 +339,13 @@ export class TeamsService {
           capacity: 'desc',
         },
       });
+
+      console.log(
+        members.map((m) => ({
+          name: m.name,
+          tasksCount: m._count.tasks,
+        })),
+      );
 
       return members.map((member) => ({
         ...member,

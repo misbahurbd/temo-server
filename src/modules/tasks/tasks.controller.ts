@@ -126,6 +126,23 @@ export class TasksController {
     };
   }
 
+  @Get('overloaded-member-count')
+  @ApiOperation({ summary: 'Get overloaded member count' })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'Overloaded member count fetched successfully',
+    type: Number,
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async getOverloadedMemberCount(@Req() req: Request & { user: SessionUser }) {
+    const count = await this.tasksService.getOverloadedMemberCount(req.user.id);
+    return {
+      message: 'Overloaded member count fetched successfully',
+      data: count,
+    };
+  }
+
   @Get(':taskId')
   @ApiOperation({ summary: 'Get a task by ID' })
   @ApiSuccessResponse({
@@ -205,6 +222,29 @@ export class TasksController {
     const result = await this.tasksService.reassignTasks(
       req.user.id,
       projectId,
+    );
+    return {
+      message: result.message,
+      data: result.data,
+    };
+  }
+
+  @Post('reassign-all')
+  @ApiOperation({
+    summary: 'Auto reassign all overloaded tasks across all projects',
+  })
+  @ApiSuccessResponse({
+    status: 200,
+    description: 'All overloaded tasks reassigned successfully',
+  })
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  async reassignAllOverloadedTasks(
+    @Req() req: Request & { user: SessionUser },
+  ) {
+    console.log(req.user.id);
+    const result = await this.tasksService.reassignAllOverloadedTasks(
+      req.user.id,
     );
     return {
       message: result.message,

@@ -4,11 +4,16 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectQueryDto } from './dto/project-query.dto';
 import { Prisma, TaskStatus } from 'generated/prisma/client';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { TaskQueryDto } from '../tasks/dto/task-query.dto';
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tasksService: TasksService,
+  ) {}
 
   async createProject(userId: string, createProjectDto: CreateProjectDto) {
     try {
@@ -184,12 +189,37 @@ export class ProjectsService {
     }
   }
 
-  async projectByIdWithTasks(userId: string, projectId: string) {
+  async projectByIdWithTasks(
+    userId: string,
+    projectId: string,
+    query: TaskQueryDto,
+  ) {
     try {
+      const page = query.page ? query.page : 1;
+      const limit = query.limit ? query.limit : 10;
+      const skip = (page - 1) * limit;
+      const orderBy = query.sortBy ? query.sortBy : 'createdAt';
+      const order = query.sortOrder ? query.sortOrder : 'desc';
+      const filterCondition = this.tasksService.buildTaskFilterCondition(
+        userId,
+        {
+          ...query,
+          projectId,
+        },
+      );
+
+      const total = await this.prisma.task.count({ where: filterCondition });
+
       const project = await this.prisma.project.findUnique({
         where: { id: projectId, createdById: userId },
         include: {
           tasks: {
+            where: filterCondition,
+            orderBy: {
+              [orderBy]: order,
+            },
+            skip,
+            take: limit,
             include: {
               assignee: {
                 select: {
@@ -213,18 +243,27 @@ export class ProjectsService {
       }
 
       return {
-        ...project,
-        tasks: project.tasks.map((task) => ({
-          ...task,
-          assignee: task.assignee
-            ? {
-                id: task.assignee.id,
-                name: task.assignee.name,
-                capacity: task.assignee.capacity,
-                tasksCount: task.assignee._count.tasks,
-              }
-            : null,
-        })),
+        data: {
+          ...project,
+          tasks: project.tasks.map((task) => ({
+            ...task,
+            assignee: task.assignee
+              ? {
+                  id: task.assignee.id,
+                  name: task.assignee.name,
+                  capacity: task.assignee.capacity,
+                  tasksCount: task.assignee._count.tasks,
+                }
+              : null,
+          })),
+        },
+        meta: {
+          page,
+          limit,
+          skip,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       };
     } catch (error) {
       this.logger.error(error);
