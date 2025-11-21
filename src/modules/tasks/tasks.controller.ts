@@ -242,7 +242,6 @@ export class TasksController {
   async reassignAllOverloadedTasks(
     @Req() req: Request & { user: SessionUser },
   ) {
-    console.log(req.user.id);
     const result = await this.tasksService.reassignAllOverloadedTasks(
       req.user.id,
     );

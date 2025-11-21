@@ -340,13 +340,6 @@ export class TeamsService {
         },
       });
 
-      console.log(
-        members.map((m) => ({
-          name: m.name,
-          tasksCount: m._count.tasks,
-        })),
-      );
-
       return members.map((member) => ({
         ...member,
         tasksCount: member._count.tasks,
